@@ -32,9 +32,9 @@ class DealDataset(Dataset):
             train_y.append(np.array(im_sr))
             train_sub4y.append(np.array(im_sub4x))
 
-        self.x_data = train_x
-        self.y_data = train_y
-        self.sub4y_data = train_sub4y
+        self.x_data = np.array(train_x).transpose((0, 3, 1, 2))
+        self.y_data = np.array(train_y).transpose((0, 3, 1, 2))
+        self.sub4y_data = np.array(train_sub4y).transpose((0, 3, 1, 2))
         self.len = len(train_x)
     
     def __getitem__(self, index):
