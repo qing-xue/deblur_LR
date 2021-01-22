@@ -80,9 +80,9 @@ def train(train_gen, model, criterion, optimizer, epoch):
     epoch_loss = 0
     for iteration, batch in enumerate(train_gen, 1):
         #input, targetdeblur, targetsr
-        LR_Blur = batch[0]
-        LR_Deblur = batch[1]
-        HR = batch[2]
+        LR_Blur = batch[0].type(torch.FloatTensor)    # 转Float
+        LR_Deblur = batch[1].type(torch.FloatTensor)  
+        HR = batch[2].type(torch.FloatTensor)  
         LR_Blur = LR_Blur.to(device)
         LR_Deblur = LR_Deblur.to(device)
         HR = HR.to(device)
