@@ -47,7 +47,12 @@ training_settings=[
 ]
 
 def mkdir_steptraing():
-    root_folder = os.path.abspath('.')
+    """Make dirs.
+
+    Step training models store in models/1 & /2 & /3."
+    """
+
+    root_folder = os.path.abspath('./GFN')
     models_folder = join(root_folder, 'models')
     step1_folder, step2_folder, step3_folder = join(models_folder,'1'), join(models_folder,'2'), join(models_folder, '3')
     isexists = os.path.exists(step1_folder) and os.path.exists(step2_folder) and os.path.exists(step3_folder)
@@ -115,7 +120,8 @@ torch.manual_seed(opt.seed)
 torch.cuda.manual_seed(opt.seed)
 
 train_dir = opt.dataset
-train_sets = [x for x in sorted(os.listdir(train_dir)) if is_hdf5_file(x)]  # 目录？
+# train_sets = [x for x in sorted(os.listdir(train_dir)) if is_hdf5_file(x)]  # 目录？
+train_sets = [x for x in sorted(os.listdir(train_dir))]                       # 000/,001/,...,239/
 print("===> Loading model and criterion")
 
 if opt.resume:
