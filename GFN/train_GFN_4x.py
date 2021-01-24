@@ -151,12 +151,12 @@ for i in range(opt.start_training_step, 4):
     for epoch in range(opt.start_epoch, opt.nEpochs+1):
         adjust_learning_rate(epoch-1)
         random.shuffle(train_sets)
-        # for j in range(len(train_sets)):
-        if True:
-            # print("Step {}:Training folder is {}-------------------------------".format(i, train_sets[j]))
+        for j in range(len(train_sets)):
+        # if True:
+            print("Step {}:Training folder is {}-------------------------------".format(i, train_sets[j]))
             # Dataset是一个包装类，用来将数据包装为Dataset类，然后传入DataLoader中
             # train_set = DataSet(join(train_dir, train_sets[j]))
-            train_set = DealDataset()
+            train_set = DealDataset(join(train_dir, train_sets[j]))
             # num_workers改为0，单进程加载
             trainloader = DataLoader(dataset=train_set, batch_size=opt.batchSize, shuffle=True, num_workers=0)
             train(trainloader, model, criterion, optimizer, epoch)
