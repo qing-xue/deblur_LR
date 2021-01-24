@@ -40,7 +40,7 @@ class DataValSet(data.Dataset):
 
 class DataSet(data.Dataset):
     def __init__(self, h5py_file_path):
-        super(DataSet, self).__init__()    # ?
+        super(DataSet, self).__init__()  
         self.hdf5_file  = h5py_file_path
 
         self.file    = h5py.File(self.hdf5_file, 'r')

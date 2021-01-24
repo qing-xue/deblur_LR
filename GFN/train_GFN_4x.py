@@ -23,7 +23,7 @@ import re
 
 # Training settings
 parser = argparse.ArgumentParser(description="PyTorch GFN Train")
-parser.add_argument("--batchSize", type=int, default=16, help="Training batch size")
+parser.add_argument("--batchSize", type=int, default=1, help="Training batch size")
 parser.add_argument("--start_training_step", type=int, default=1, help="Training step")
 parser.add_argument("--nEpochs", type=int, default=60, help="Number of epochs to train")
 parser.add_argument("--lr", type=float, default=1e-4, help="Learning rate, default=1e-4")
@@ -121,7 +121,9 @@ torch.cuda.manual_seed(opt.seed)
 
 train_dir = opt.dataset
 # train_sets = [x for x in sorted(os.listdir(train_dir)) if is_hdf5_file(x)]  # 目录？
-train_sets = [x for x in sorted(os.listdir(train_dir))]                       # 000/,001/,...,239/
+train_sets = [x for x in sorted(os.listdir(train_dir)) if os.path.isdir(x)]   # 000/,001/,...,239/
+if not train_sets:
+    train_sets.append(".")
 print("===> Loading model and criterion")
 
 if opt.resume:

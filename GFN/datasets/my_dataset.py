@@ -23,7 +23,7 @@ class DealDataset(Dataset):
         # self.x_data = torch.from_numpy(xy[:, 0:-1])
         # self.y_data = torch.from_numpy(xy[:, [-1]])
 
-        super(DataSet, self).__init__()     # 仍集成父类原有属性，防止def init覆盖初始化
+        super(Dataset, self).__init__()     # 仍继承父类原有属性，防止def init覆盖初始化
         self.imgs_lr_path  = imgs_lr_path
 
         train_x, train_y, train_sub4y = [], [], []
