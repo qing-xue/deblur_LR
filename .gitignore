@@ -1,4 +1,5 @@
 ## ignore this file ##
 /.vscode/
-.pkl
-.pyc
+/GFN/models/
+*.pkl
+*.pyc
