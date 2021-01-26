@@ -23,7 +23,7 @@ import re
 
 # Training settings
 parser = argparse.ArgumentParser(description="PyTorch GFN Train")
-parser.add_argument("--batchSize", type=int, default=1, help="Training batch size")
+parser.add_argument("--batchSize", type=int, default=16, help="Training batch size")
 parser.add_argument("--start_training_step", type=int, default=1, help="Training step")
 parser.add_argument("--nEpochs", type=int, default=60, help="Number of epochs to train")
 parser.add_argument("--lr", type=float, default=1e-4, help="Learning rate, default=1e-4")
@@ -36,11 +36,11 @@ parser.add_argument("--lambda_db", type=float, default=0.5, help="Weight of debl
 parser.add_argument("--gated", type=bool, default=False, help="Activated gate module")
 parser.add_argument("--isTest", type=bool, default=False, help="Test or not")
 parser.add_argument('--dataset', required=True, help='Path of the training dataset(.h5)')
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'    # 只有编号为0的GPU对程序是可见的
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# To facilitate the network training, we adopt a two-step training strategy
-training_settings=[
+# To facilitate the network training, we adopt a two-step? training strategy
+training_settings = [
     {'nEpochs': 25, 'lr': 1e-4, 'step':  7, 'lr_decay': 0.5, 'lambda_db': 0.5, 'gated': False},
     {'nEpochs': 60, 'lr': 1e-4, 'step': 30, 'lr_decay': 0.1, 'lambda_db': 0.5, 'gated': False},
     {'nEpochs': 55, 'lr': 5e-5, 'step': 25, 'lr_decay': 0.1, 'lambda_db':   0, 'gated': True}
@@ -82,9 +82,13 @@ def checkpoint(step, epoch):
     print("===>Checkpoint saved to {}".format(model_out_path))
 
 def train(train_gen, model, criterion, optimizer, epoch):
+    """Train an epoch from different dirs.
+
+    """
+
     epoch_loss = 0
     for iteration, batch in enumerate(train_gen, 1):
-        #input, targetdeblur, targetsr
+        # input, targetdeblur, targetsr
         LR_Blur = batch[0].type(torch.FloatTensor)    # 转Float
         LR_Deblur = batch[1].type(torch.FloatTensor)  
         HR = batch[2].type(torch.FloatTensor)  
@@ -110,8 +114,8 @@ def train(train_gen, model, criterion, optimizer, epoch):
         optimizer.zero_grad()
         mse.backward()
         optimizer.step()
-        if iteration % 100 == 0:
-            print("===> Epoch[{}]({}/{}): Loss{:.4f};".format(epoch, iteration, len(trainloader), mse.cpu()))
+        # if iteration % 100 == 0:
+        #     print("===> Epoch[{}]({}/{}): Loss{:.4f};".format(epoch, iteration, len(trainloader), mse.cpu()))
     print("===>Epoch{} Complete: Avg loss is :{:4f}".format(epoch, epoch_loss / len(trainloader)))
 
 opt = parser.parse_args()
