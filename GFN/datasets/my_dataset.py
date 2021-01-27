@@ -1,10 +1,9 @@
 import os
+import sys
 import imageio
 import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset
-
-datadir = 'F:/workplace/public_dataset/REDS/train/train_blur_bicubic/X4/000'
 
 def find_lr_hr_file(base):
     for root, ds, fs in os.walk(base):
@@ -53,5 +52,13 @@ class DealDataset(Dataset):
     def __len__(self):
         return self.len
 
-# 实例化这个类，然后我们就得到了Dataset类型的数据，记下来就将这个类传给DataLoader，就可以了。    
-dealDataset = DealDataset(datadir)
+# 实例化这个类，然后我们就得到了Dataset类型的数据，记下来就将这个类传给DataLoader，就可以了。   
+# datadir = 'F:/workplace/public_dataset/REDS/train/train_blur_bicubic/X4/000'
+# dealDataset = DealDataset(datadir)
+
+if __name__ == '__main__':
+    datadir = sys.argv[1]
+    print(datadir)
+    dealDataset = DealDataset(datadir)
+
+# python GFN/datasets/my_dataset.py F:/workplace/public_dataset/REDS/train/train_blur_bicubic/X4/000
