@@ -41,7 +41,14 @@ class DealDataset(Dataset):
         self.len = len(train_x)
     
     def __getitem__(self, index):
-        return self.x_data[index], self.sub4y_data[index], self.y_data[index]
+        # preprocess
+        input_patch  = np.asarray(self.x_data[index, :, :, :], np.float32) / 255
+        hr_patch     = np.asarray(self.y_data[index, :, :, :], np.float32) / 255
+        deblur_patch = np.asarray(self.sub4y_data[index, :, :, :], np.float32) / 255
+
+        return input_patch.copy(),\
+               deblur_patch.copy(),\
+               hr_patch.copy()
 
     def __len__(self):
         return self.len

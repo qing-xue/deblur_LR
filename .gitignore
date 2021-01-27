@@ -3,3 +3,4 @@
 /GFN/models/
 *.pkl
 *.pyc
+*.m
