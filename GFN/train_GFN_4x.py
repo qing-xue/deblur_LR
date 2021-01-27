@@ -124,8 +124,8 @@ torch.manual_seed(opt.seed)
 torch.cuda.manual_seed(opt.seed)
 
 train_dir = opt.dataset
-# train_sets = [x for x in sorted(os.listdir(train_dir)) if is_hdf5_file(x)]  # 目录？
-train_sets = [x for x in sorted(os.listdir(train_dir)) if os.path.isdir(x)]   # 000/,001/,...,239/
+# train_sets = [x for x in sorted(os.listdir(train_dir)) if is_hdf5_file(x)]            # 目录？
+train_sets = [x for x in os.listdir(train_dir) if os.path.isdir(join(train_dir, x))]    # 000/,001/,...,239/
 if not train_sets:
     train_sets.append(".")
 print("===> Loading model and criterion")
