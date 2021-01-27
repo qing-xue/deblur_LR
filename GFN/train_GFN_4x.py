@@ -77,7 +77,7 @@ def adjust_learning_rate(epoch):
             param_group['lr'] = lr
 
 def checkpoint(step, epoch):
-    model_out_path = "models/{}/GFN_epoch_{}.pkl".format(step, epoch)
+    model_out_path = "GFN/models/{}/GFN_epoch_{}.pkl".format(step, epoch)
     torch.save(model, model_out_path)
     print("===>Checkpoint saved to {}".format(model_out_path))
 
