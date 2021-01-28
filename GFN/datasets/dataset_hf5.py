@@ -53,7 +53,7 @@ class DataSet(data.Dataset):
         return self.inputs.shape[0]
 
     def __getitem__(self, index):
-        #print(index)
+        # print(index)
         # numpy
         input_patch  = np.asarray(self.inputs[index, :, :, :], np.float32)
         deblur_patch = np.asarray(self.deblurs[index, :, :, :], np.float32)
