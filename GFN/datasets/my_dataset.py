@@ -1,6 +1,7 @@
 import os
 import sys
 import numpy as np
+import h5py
 from PIL import Image
 from torch.utils.data import Dataset
 
@@ -51,13 +52,37 @@ class DealDataset(Dataset):
     def __len__(self):
         return self.len
 
-# 实例化这个类，然后我们就得到了Dataset类型的数据，记下来就将这个类传给DataLoader，就可以了。   
-# datadir = 'F:/workplace/public_dataset/REDS/train/train_blur_bicubic/X4/000'
-# dealDataset = DealDataset(datadir)
+class TripleDataSet(Dataset):
+    def __init__(self, h5py_file_path):
+        super(Dataset, self).__init__()  
+        self.hdf5_file  = h5py_file_path
+
+        self.file    = h5py.File(self.hdf5_file, 'r')
+        # print(self.file.keys())
+        self.inputs  = self.file.get("data")
+        self.deblurs = self.file.get("label_db")
+        self.hrs     = self.file.get("label")
+        # pass
+
+    def __len__(self):
+        return self.inputs.shape[0]
+
+    def __getitem__(self, index):
+        input_patch  = np.asarray(self.inputs[index, :, :, :], np.float32) / 255
+        deblur_patch = np.asarray(self.deblurs[index, :, :, :], np.float32) / 255
+        hr_patch     = np.asarray(self.hrs[index, :, :, :], np.float32) / 255
+
+        return input_patch.copy(),\
+               deblur_patch.copy(),\
+               hr_patch.copy()
 
 if __name__ == '__main__':
-    datadir = sys.argv[1]
-    print(datadir)
-    dealDataset = DealDataset(datadir)
+    # datadir = sys.argv[1]
+    # print(datadir)
+    # dealDataset = DealDataset(datadir)
+
+    datadir = 'F:/workplace/public_dataset/REDS/train/train_blur_bicubic/X4/dataset10.hdf5'
+    tripleDataSet = TripleDataSet(datadir)
 
 # python GFN/datasets/my_dataset.py F:/workplace/public_dataset/REDS/train/train_blur_bicubic/X4/000
+# python GFN/datasets/my_dataset.py F:/workplace/public_dataset/REDS/train/train_blur_bicubic/X4/dataset10.hdf5

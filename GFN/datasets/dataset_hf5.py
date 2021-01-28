@@ -45,7 +45,7 @@ class DataSet(data.Dataset):
 
         self.file    = h5py.File(self.hdf5_file, 'r')
         #self.file.keys()
-        self.inputs  = self.file.get("data")
+        self.inputs  = self.file['data']
         self.deblurs = self.file.get("label_db")
         self.hrs     = self.file.get("label")
 
