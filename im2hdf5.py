@@ -4,6 +4,7 @@ import numpy as np
 import h5py
 import sys
 from PIL import Image
+import os
 
 # REDS = 'F:/workplace/public_dataset/REDS'
 # python im2hdf5.py F:/workplace/public_dataset/REDS /*/*.png 1000
@@ -22,6 +23,9 @@ if __name__ == '__main__':
     train_addrs = glob.glob(LR_train_path)
 
     # loop over train addresses
+    h5_folder = REDS + '/train/h5'
+    if not os.path.exists(h5_folder):
+        os.makedirs(h5_folder)
     train_x, train_sub4y, train_y = [], [], []
     for i in range(len(train_addrs)):
         # read an image and ...
@@ -37,7 +41,7 @@ if __name__ == '__main__':
         if (i + 1) % num_per_hf5 == 0 and i > 1:
             print('Train data: {}/{}'.format(i, len(train_addrs)))
             # open a hdf5 file and create earrays
-            hdf5_path = train_blur_bicubic + '/dataset{}.hdf5'.format(i // num_per_hf5)
+            hdf5_path = h5_folder + '/dataset{}.hdf5'.format(i // num_per_hf5)
             hdf5_file = h5py.File(hdf5_path, 'w')
             dset1 = hdf5_file.create_dataset("data",  data = np.array(train_x).transpose((0, 3, 1, 2)))
             dset3 = hdf5_file.create_dataset("label", data = np.array(train_y).transpose((0, 3, 1, 2)))
@@ -51,7 +55,7 @@ if __name__ == '__main__':
     if  len(train_x) > 1:
         print('Train data: res/{}'.format(len(train_addrs)))
         # open a hdf5 file and create earrays
-        hdf5_path = train_blur_bicubic + '/dataset_.hdf5'
+        hdf5_path = h5_folder + '/dataset_.hdf5'
         hdf5_file = h5py.File(hdf5_path, 'w')
         dset1 = hdf5_file.create_dataset("data",  data = np.array(train_x).transpose((0, 3, 1, 2)))
         dset3 = hdf5_file.create_dataset("label", data = np.array(train_y).transpose((0, 3, 1, 2)))

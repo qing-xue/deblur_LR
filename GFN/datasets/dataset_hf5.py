@@ -54,7 +54,6 @@ class DataSet(data.Dataset):
 
     def __getitem__(self, index):
         # print(index)
-        # numpy
         input_patch  = np.asarray(self.inputs[index, :, :, :], np.float32)
         deblur_patch = np.asarray(self.deblurs[index, :, :, :], np.float32)
         hr_patch     = np.asarray(self.hrs[index, :, :, :], np.float32)

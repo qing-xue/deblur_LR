@@ -16,7 +16,7 @@ from os.path import join
 import torch
 from torch.utils.data import DataLoader
 from datasets.dataset_hf5 import DataSet
-from datasets.my_dataset import DealDataset
+from datasets.my_dataset import TripleDataSet
 from networks.GFN_4x import Net
 import random
 import re
@@ -63,7 +63,7 @@ def mkdir_steptraing():
         print("===> Step training models store in models/1 & /2 & /3.")
 
 def is_hdf5_file(filename):
-    return any(filename.endswith(extension) for extension in [".h5"])
+    return any(filename.endswith(extension) for extension in [".h5", "hdf5"])
 
 def which_trainingstep_epoch(resume):
     trainingstep = "".join(re.findall(r"\d", resume)[0])
@@ -124,8 +124,8 @@ torch.manual_seed(opt.seed)
 torch.cuda.manual_seed(opt.seed)
 
 train_dir = opt.dataset
-# train_sets = [x for x in sorted(os.listdir(train_dir)) if is_hdf5_file(x)]            # 目录？
-train_sets = [x for x in os.listdir(train_dir) if os.path.isdir(join(train_dir, x))]    # 000/,001/,...,239/
+train_sets = [x for x in os.listdir(train_dir) if is_hdf5_file(x)]            
+# train_sets = [x for x in os.listdir(train_dir) if os.path.isdir(join(train_dir, x))]    # 000/,001/,...,239/
 if len(train_sets) < 1:
     train_sets.append(".")
 print("===> Loading model and criterion")
@@ -158,14 +158,18 @@ for i in range(opt.start_training_step, 4):
         adjust_learning_rate(epoch-1)
         random.shuffle(train_sets)
         for j in range(len(train_sets)):
-        # if True:
             print("Step {}:Training folder is {}-------------------------------".format(i, train_sets[j]))
-            # Dataset是一个包装类，用来将数据包装为Dataset类，然后传入DataLoader中
             # train_set = DataSet(join(train_dir, train_sets[j]))
-            train_set = DealDataset(join(train_dir, train_sets[j]))
+            train_set = TripleDataSet(join(train_dir, train_sets[j]))
+            # train_set = DealDataset(join(train_dir, train_sets[j]))
             # num_workers改为0，单进程加载
             trainloader = DataLoader(dataset=train_set, batch_size=opt.batchSize, shuffle=True, num_workers=0)
             train(trainloader, model, criterion, optimizer, epoch)
         checkpoint(i, epoch)
     # Finish an epoch and reset start_epoch
     opt.start_epoch = 1
+
+
+# "F:/workplace/public_dataset/REDS/train/h5"
+# "F:/workplace/public_dataset/GOPRO_Large/GOPRO_train256_4x_HDF5"
+# "F:/workplace/public_dataset/REDS/train/train_blur_bicubic/X4"
