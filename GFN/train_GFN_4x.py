@@ -40,10 +40,15 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '0'    # 只有编号为0的GPU对程序是
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # To facilitate the network training, we adopt a two-step? training strategy
+# training_settings = [
+#     {'nEpochs': 25, 'lr': 1e-4, 'step':  7, 'lr_decay': 0.5, 'lambda_db': 0.5, 'gated': False},
+#     {'nEpochs': 60, 'lr': 1e-4, 'step': 30, 'lr_decay': 0.1, 'lambda_db': 0.5, 'gated': False},
+#     {'nEpochs': 55, 'lr': 5e-5, 'step': 25, 'lr_decay': 0.1, 'lambda_db':   0, 'gated': True}
+# ]
 training_settings = [
-    {'nEpochs': 25, 'lr': 1e-4, 'step':  7, 'lr_decay': 0.5, 'lambda_db': 0.5, 'gated': False},
-    {'nEpochs': 60, 'lr': 1e-4, 'step': 30, 'lr_decay': 0.1, 'lambda_db': 0.5, 'gated': False},
-    {'nEpochs': 55, 'lr': 5e-5, 'step': 25, 'lr_decay': 0.1, 'lambda_db':   0, 'gated': True}
+    {'nEpochs': 10, 'lr': 1e-4, 'step':  2, 'lr_decay': 0.5, 'lambda_db': 0.5, 'gated': False},
+    {'nEpochs': 20, 'lr': 1e-4, 'step': 10, 'lr_decay': 0.1, 'lambda_db': 0.5, 'gated': False},
+    {'nEpochs': 20, 'lr': 5e-5, 'step': 10, 'lr_decay': 0.1, 'lambda_db':   0, 'gated': True}
 ]
 
 def mkdir_steptraing():
