@@ -54,7 +54,7 @@ training_settings = [
 def mkdir_steptraing():
     """Make dirs.
 
-    Step training models store in models/1 & /2 & /3."
+    Step training models store in models/1 & /2 & /3.
     """
 
     root_folder = os.path.abspath('./GFN')

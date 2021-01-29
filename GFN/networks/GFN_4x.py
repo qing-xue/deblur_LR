@@ -5,6 +5,9 @@ import torch.nn.init as init
 import os
 
 class _ResBLockDB(nn.Module):
+    """ResBlocks in Deblur module
+
+    """
     def __init__(self, inchannel, outchannel, stride=1):
         super(_ResBLockDB, self).__init__()
         self.layers = nn.Sequential(
@@ -26,6 +29,10 @@ class _ResBLockDB(nn.Module):
         return out
 
 class _ResBlockSR(nn.Module):
+    """ResBlocks in SR module
+
+    """
+
     def __init__(self, inchannel, outchannel, stride=1):
         super(_ResBlockSR, self).__init__()
         self.layers = nn.Sequential(
@@ -105,6 +112,10 @@ class _DeblurringMoudle(nn.Module):
         return deblur_feature, deblur_out      # 返回deblur特征图和低分辨率的deblur输出
 
 class _SRMoudle(nn.Module):
+    """Super-resolution feature extraction module.
+
+    We use eight ResBlocks [20] to extract high-dimensional features for image super-resolution.
+    """
     def __init__(self):
         super(_SRMoudle, self).__init__()
         self.conv1 = nn.Conv2d(3, 64, (7, 7), 1, padding=3)
@@ -153,6 +164,13 @@ class _GateMoudle(nn.Module):
         return scoremap
 
 class _ReconstructMoudle(nn.Module):
+    """Reconstruction module.
+
+    The fused features φfusion from the gate module are fed into 8 ResBlocks 
+    and 2 pixel-shuffling layers [34] to enlarge the spatial resolution by 4×. 
+    We then use 2 final convolutional layers to reconstruct an HR output image H?.
+    """
+
     def __init__(self):
         super(_ReconstructMoudle, self).__init__()
         self.resBlock = self._makelayers(64, 64, 8)
