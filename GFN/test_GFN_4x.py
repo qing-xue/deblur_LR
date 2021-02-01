@@ -130,7 +130,7 @@ if opt.intermediate_process:
         print("It's not a pkl file. Please give a correct pkl folder on command line for example --opt.intermediate_process /models/1/GFN_epoch_25.pkl)")
 else:
     # test_dir = 'models/'
-    test_dir = 'GFN/models/3'
+    test_dir = 'GFN/models'
     test_list = [x for x in sorted(os.listdir(test_dir)) if is_pkl(x)]
     print("Testing on the given 3-step trained model which stores in /models, and ends with pkl.")
     for i in range(len(test_list)):
