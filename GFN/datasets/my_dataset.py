@@ -10,7 +10,7 @@ def find_lr_hr_file(base):
         for f in fs:
             if f.endswith('.png'):
                 fullname = os.path.join(root, f)
-                ref_full = fullname.replace("train_blur_bicubic/X4", "train_sharp")
+                ref_full = fullname.replace("val_blur_bicubic/X4", "val_sharp")
                 yield fullname, ref_full
 
 class DealDataset(Dataset):

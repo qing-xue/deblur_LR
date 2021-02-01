@@ -19,6 +19,7 @@ from torchvision import utils as utils
 import torch
 from torch.utils.data import DataLoader
 from datasets.dataset_hf5 import DataValSet
+from datasets.my_dataset import DealDataset
 import statistics
 import matplotlib.pyplot as plot
 import re
@@ -106,14 +107,15 @@ def model_test(model):
     test(testloader, model, criterion, SR_dir)
 
 opt = parser.parse_args()
-root_val_dir = opt.dataset# #----------Validation path
+root_val_dir = opt.dataset              # #----------Validation path
 SR_dir = join(root_val_dir, 'Results')  #--------------------------SR results save path
 isexists = os.path.exists(SR_dir)
 if not isexists:
     os.makedirs(SR_dir)
 print("The results of testing images sotre in {}.".format(SR_dir))
 
-testloader = DataLoader(DataValSet(root_val_dir), batch_size=1, shuffle=False, pin_memory=False)
+# testloader = DataLoader(DataValSet(root_val_dir), batch_size=1, shuffle=False, pin_memory=False)
+testloader = DataLoader(DealDataset(root_val_dir), batch_size=1, shuffle=False, pin_memory=False)
 print("===> Loading model and criterion")
 
 if opt.intermediate_process:
@@ -128,12 +130,13 @@ if opt.intermediate_process:
         print("It's not a pkl file. Please give a correct pkl folder on command line for example --opt.intermediate_process /models/1/GFN_epoch_25.pkl)")
 else:
     # test_dir = 'models/'
-    test_dir = 'GFN/models/'
+    test_dir = 'GFN/models/3'
     test_list = [x for x in sorted(os.listdir(test_dir)) if is_pkl(x)]
     print("Testing on the given 3-step trained model which stores in /models, and ends with pkl.")
     for i in range(len(test_list)):
         print("Testing model is {}----------------------------------".format(test_list[i]))
         model = torch.load(join(test_dir, test_list[i]))
+        # model = torch.jit.load(join(test_dir, test_list[i]))   # 版本不一致，保存要改
         model_test(model)
 
 # python GFN/test_GFN_4x.py --dataset your_downloads_directory/GOPRO_Large/Validation_4x
