@@ -89,9 +89,15 @@ def test(test_gen, model, criterion, SR_dir):
             psnr = 10 * log10(1 / mse)
             avg_psnr += psnr
 
-        print("Avg. SR PSNR:{:4f} dB".format(avg_psnr / iteration))
-        median_time = statistics.median(med_time)
-        print(median_time)
+        str_psnr = "Avg. SR PSNR:{:4f} dB".format(avg_psnr / iteration)
+        str_mt   = "Mean time: " + str(statistics.median(med_time))
+        print(str_psnr)
+        print(str_mt)
+        # save
+        f = open('log/test.txt', 'w')
+        print(str_psnr, f) 
+        print(str_mt  , f)
+        f.close()
 
 def model_test(model):
     model = model.to(device)
@@ -107,8 +113,9 @@ def model_test(model):
     test(testloader, model, criterion, SR_dir)
 
 opt = parser.parse_args()
-root_val_dir = opt.dataset              # #----------Validation path
-SR_dir = join(root_val_dir, 'Results')  #--------------------------SR results save path
+root_val_dir = opt.dataset                         #----------Validation path
+# SR_dir = join(root_val_dir, 'Results') 
+SR_dir = join('.', 'Results')
 isexists = os.path.exists(SR_dir)
 if not isexists:
     os.makedirs(SR_dir)

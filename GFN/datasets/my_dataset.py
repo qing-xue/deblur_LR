@@ -18,10 +18,6 @@ class DealDataset(Dataset):
         下载数据、初始化数据，都可以在这里完成
     """
     def __init__(self, imgs_lr_path):
-        # xy = np.loadtxt('../dataSet/diabetes.csv.gz', delimiter=',', dtype=np.float32)  # 使用numpy读取数据
-        # self.x_data = torch.from_numpy(xy[:, 0:-1])
-        # self.y_data = torch.from_numpy(xy[:, [-1]])
-
         super(Dataset, self).__init__()     # 仍继承父类原有属性，防止def init覆盖初始化
         self.imgs_lr_path  = imgs_lr_path
 
@@ -45,9 +41,10 @@ class DealDataset(Dataset):
         hr_patch     = np.asarray(self.y_data[index, :, :, :], np.float32) / 255
         deblur_patch = np.asarray(self.sub4y_data[index, :, :, :], np.float32) / 255
 
+        # mind the order!!!
         return input_patch.copy(),\
-               deblur_patch.copy(),\
-               hr_patch.copy()
+               hr_patch.copy(),\
+               deblur_patch.copy()
 
     def __len__(self):
         return self.len

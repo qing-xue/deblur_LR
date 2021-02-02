@@ -1,6 +1,7 @@
 ## ignore this file ##
 /.vscode/
 /GFN/models/
+/Results/
 *.pkl
 *.pyc
 *.m
