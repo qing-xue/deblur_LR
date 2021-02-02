@@ -95,8 +95,8 @@ def test(test_gen, model, criterion, SR_dir):
         print(str_mt)
         # save
         f = open('log/test.txt', 'w')
-        print(str_psnr, f) 
-        print(str_mt  , f)
+        f.write(str_psnr)
+        f.write(str_mt)
         f.close()
 
 def model_test(model):
