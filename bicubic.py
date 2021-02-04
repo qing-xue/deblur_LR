@@ -1,14 +1,14 @@
 import numpy as np
 from PIL import Image
 
-datadir = 'F:/workplace/Public Dataset/NTIRE 2021 deblur track 1/REDS'
+datadir = 'F:/workplace/public_dataset/REDS'
 
 # demo image
 im_sr = Image.open(datadir + '/val/val_sharp/000/00000001.png')
 im_lr = im_sr.resize((im_sr.size[0] // 4, im_sr.size[1] // 4), Image.BICUBIC)
 
-# im_sr.show()
-im_lr.show()
+im_sr.show()
+# im_lr.show()
 
 # official blur images
 im_blur = Image.open(datadir + '/val/val_blur_bicubic/X4/000/00000001.png')
@@ -21,8 +21,8 @@ def L1(yhat, y):
 
 print("Blur  L1 = ", (L1(np.array(im_lr), np.array(im_blur))))     # 48., 57., 67, 75., 66.
 
-im_sharp = im_lr.resize((im_lr.size[0] * 4, im_lr.size[1] * 4), Image.BICUBIC)
-# im_sharp.show()
+im_sharp = im_blur.resize((im_blur.size[0] * 4, im_blur.size[1] * 4), Image.BICUBIC)
+im_sharp.show()
 print("Sharp L1 = ", (L1(np.array(im_sharp), np.array(im_sr))))    # 114., 115., 115.
 
 # PSNR and SSIM 

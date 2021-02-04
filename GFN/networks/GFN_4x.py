@@ -225,6 +225,7 @@ class Net(nn.Module):
         deblur_feature, deblur_out = self.deblurMoudle(x)
         sr_feature = self.srMoudle(x)
         if gated == True:
+            # torch.cat((A,B),dim)时，除拼接维数dim数值可不同外其余维数数值需相同，方能对齐。
             scoremap = self.geteMoudle(torch.cat((deblur_feature, x, sr_feature), 1))
         else:
             scoremap = torch.cuda.FloatTensor().resize_(sr_feature.shape).zero_()+1
