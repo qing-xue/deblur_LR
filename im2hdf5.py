@@ -6,10 +6,53 @@ import sys
 from PIL import Image
 import os
 
+# im = Image.open('F:/workplace/public_dataset/REDS/val/val_sharp/000/00000000.png')
+# patches = im_crop(im)
+def im_crop(im, box_w=256, box_h=256, stride=256):
+    width = im.size[0]
+    height = im.size[1]
+    patches = []
+
+    iw = np.arange(0, width  - box_w + 1, stride)
+    jh = np.arange(0, height - box_h + 1, stride)
+    for i in iw:
+        for j in jh:
+            cm = im.crop(box = (i, j, i + box_w, j + box_h))
+            # print((i, j, i + box_w, j + box_h))
+            patches.append(cm) 
+
+    # 方案一：补边 方案二：两头向中间（waiting）
+    if width % box_w != 0:
+        for j in jh:
+            cm = im.crop(box = (width - box_w, j, width, j + box_h))
+            # print((width - box_w, j, width, j + box_h))
+            patches.append(cm) 
+        if height % box_h != 0:
+            # 可能与另一方向的有重复
+            cm = im.crop(box = (width - box_w, height - box_h, width, height))
+            patches.append(cm) 
+    if height % box_h != 0:
+        for i in iw:
+            cm = im.crop(box = (i, height - box_h, i + box_w, height))
+            # print((i, height - box_h, i + box_w, height))
+            patches.append(cm) 
+        if width % box_w != 0:
+            cm = im.crop(box = (width - box_w, height - box_h, width, height))
+            patches.append(cm) 
+
+    return patches
+
+
 # REDS = 'F:/workplace/public_dataset/REDS'
 # python im2hdf5.py F:/workplace/public_dataset/REDS /*/*.png 1000
 
 if __name__ == '__main__':
+
+    # im = Image.open('F:/workplace/public_dataset/REDS/val/val_sharp/000/00000000.png')
+    # patches = im_crop(im)
+    # for i in patches:
+    #     i.show()
+
     # REDS = 'F:/workplace/public_dataset/REDS'
     REDS = sys.argv[1]
     files = sys.argv[2]
