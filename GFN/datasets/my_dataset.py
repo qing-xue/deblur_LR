@@ -59,7 +59,6 @@ class TripleDataSet(Dataset):
         self.inputs  = self.file.get("data")
         self.deblurs = self.file.get("label_db")
         self.hrs     = self.file.get("label")
-        # pass
 
     def __len__(self):
         return self.inputs.shape[0]
@@ -68,6 +67,12 @@ class TripleDataSet(Dataset):
         input_patch  = np.asarray(self.inputs[index, :, :, :], np.float32) / 255
         deblur_patch = np.asarray(self.deblurs[index, :, :, :], np.float32) / 255
         hr_patch     = np.asarray(self.hrs[index, :, :, :], np.float32) / 255
+        
+        # randomly rotation
+        rotation_times = random.randint(0, 3)
+        input_patch    = np.rot90(input_patch, rotation_times, (1, 2))
+        deblur_patch   = np.rot90(deblur_patch, rotation_times, (1, 2))
+        hr_patch       = np.rot90(hr_patch, rotation_times, (1, 2))
 
         return input_patch.copy(),\
                deblur_patch.copy(),\
@@ -78,8 +83,9 @@ if __name__ == '__main__':
     # print(datadir)
     # dealDataset = DealDataset(datadir)
 
-    datadir = 'F:/workplace/public_dataset/REDS/train/train_blur_bicubic/X4/dataset10.hdf5'
+    datadir = 'F:/workplace/public_dataset/REDS/train/h5/dataset0.hdf5'
     tripleDataSet = TripleDataSet(datadir)
+    pass
 
 # python GFN/datasets/my_dataset.py F:/workplace/public_dataset/REDS/train/train_blur_bicubic/X4/000
 # python GFN/datasets/my_dataset.py F:/workplace/public_dataset/REDS/train/train_blur_bicubic/X4/dataset10.hdf5
