@@ -68,12 +68,12 @@ def im_LRHR_show(im_lr, im_hr, im_lr_GT):
 # num_per_hf5 = 1000  
 if __name__ == '__main__':
 
-    REDS = 'F:/workplace/public_dataset/REDS'
-    files = '/*/*.png'
-    num_per_hf5 = 100 
-    # REDS = sys.argv[1]
-    # files = sys.argv[2]
-    # num_per_hf5 = int(sys.argv[3])    # notice that if it can divide exactly!!!
+    # REDS = 'F:/workplace/public_dataset/REDS'
+    # files = '/*/*.png'
+    # num_per_hf5 = 100 
+    REDS = sys.argv[1]
+    files = sys.argv[2]
+    num_per_hf5 = int(sys.argv[3])    # notice that if it can divide exactly!!!
 
     train_blur_bicubic = REDS + '/train/train_blur_bicubic/X4'
     train_sharp = REDS + '/train/train_sharp'
