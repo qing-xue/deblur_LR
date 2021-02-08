@@ -4,6 +4,7 @@ import numpy as np
 import h5py
 from PIL import Image
 from torch.utils.data import Dataset
+import random
 
 def find_lr_hr_file(base):
     for root, ds, fs in os.walk(base):

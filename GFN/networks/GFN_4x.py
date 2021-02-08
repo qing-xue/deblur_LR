@@ -229,7 +229,7 @@ class Net(nn.Module):
             # torch.cat((A,B),dim)时，除拼接维数dim数值可不同外其余维数数值需相同，方能对齐。
             scoremap = self.geteMoudle(torch.cat((deblur_feature, x, sr_feature), 1))
         else:
-            scoremap = torch.cuda.FloatTensor().resize_(sr_feature.shape).p()+1
+            scoremap = torch.cuda.FloatTensor().resize_(sr_feature.shape).zero_()+1
         repair_feature = torch.mul(scoremap, deblur_feature)
         fusion_feature = torch.add(sr_feature, repair_feature)
         recon_out = self.reconstructMoudle(fusion_feature)
