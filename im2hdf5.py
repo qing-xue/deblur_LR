@@ -3,50 +3,59 @@ import glob
 import numpy as np
 import h5py
 import sys
-from PIL import Image
+from PIL import Image, ImageDraw
 import os
 from matplotlib import pyplot as plt
 import random
 
-def im_crop(im, box_w=256, box_h=256, stride=256):
+def im_crop(im, box_w=256, box_h=256, stride_w=256, stride_h=256, epsilon=10):
+    """Crop image to get patches.
+
+    :param epsilon: 边界容忍值，低于之则直接丢弃
+    :return: 返回截取的 patches 以及其对应于原图的坐标
+    """
     width = im.size[0]
     height = im.size[1]
-    patches = []
-
-    iw = np.arange(0, width  - box_w + 1, stride)
-    jh = np.arange(0, height - box_h + 1, stride)
+    patches, patches_idx = [], []
+    iw = np.arange(0, width  - box_w + 1, stride_w)
+    jh = np.arange(0, height - box_h + 1, stride_h)
     for i in iw:
         for j in jh:
-            cm = im.crop(box = (i, j, i + box_w, j + box_h))
-            # print((i, j, i + box_w, j + box_h))
+            box = (i, j, i + box_w, j + box_h)
+            cm = im.crop(box)
             patches.append(cm) 
-
-    # 方案一：补边 方案二：两头向中间（waiting）
-    if width % box_w != 0:
+            patches_idx.append(box)
+    # repair x and y orientation's boundary
+    if width - box_w - iw[-1] > epsilon:
         for j in jh:
-            cm = im.crop(box = (width - box_w, j, width, j + box_h))
-            # print((width - box_w, j, width, j + box_h))
+            box = (width - box_w, j, width, j + box_h)
+            cm = im.crop(box)
             patches.append(cm) 
-        if height % box_h != 0:
-            # 可能与另一方向的有重复
-            cm = im.crop(box = (width - box_w, height - box_h, width, height))
-            patches.append(cm) 
-    if height % box_h != 0:
+            patches_idx.append(box)
+    if height - box_h - jh[-1] > epsilon:
         for i in iw:
-            cm = im.crop(box = (i, height - box_h, i + box_w, height))
-            # print((i, height - box_h, i + box_w, height))
+            box = (i, height - box_h, i + box_w, height)
+            cm = im.crop(box)
             patches.append(cm) 
-        if width % box_w != 0:
-            cm = im.crop(box = (width - box_w, height - box_h, width, height))
-            patches.append(cm) 
+            patches_idx.append(box)
+    # need only once
+    if width - box_w - iw[-1] > epsilon and height - box_h - jh[-1] > epsilon:
+        box = (width - box_w, height - box_h, width, height)
+        cm = im.crop(box)
+        patches.append(cm) 
+        patches_idx.append(box)
 
-    return patches
+    return patches, patches_idx
 
 def test_im_crop():
     im = Image.open('F:/workplace/public_dataset/REDS/val/val_sharp/000/00000000.png')
-    patches = im_crop(im)
-    for i in patches:
-        i.show()
+    patches, boxes = im_crop(im, box_w=256, box_h=256, stride_w=256, stride_h=256)
+    draw = ImageDraw.Draw(im)
+    for box in boxes:
+        color = (random.randint(64,255), random.randint(64,255), random.randint(64,255))
+        draw.rectangle(box, outline=color, width=3)
+        im.show()
+    im.show()
 
 def im_LRHR_show(im_lr, im_hr, im_lr_GT):
     plt.subplot(2,2,1)
@@ -67,6 +76,8 @@ def im_LRHR_show(im_lr, im_hr, im_lr_GT):
 # files = '/*/*.png'
 # num_per_hf5 = 1000  
 if __name__ == '__main__':
+
+    test_im_crop()
 
     # REDS = 'F:/workplace/public_dataset/REDS'
     # files = '/*/*.png'
@@ -97,9 +108,9 @@ if __name__ == '__main__':
         im_sub4y = im_sr.resize((im_sr.size[0] // 4, im_sr.size[1] // 4), Image.BICUBIC)
   
         # get patches
-        im_lr_patches = im_crop(im_lr, box_w=256//4, box_h=256//4, stride=256//4)
-        im_sr_patches = im_crop(im_sr, box_w=256, box_h=256, stride=256)
-        im_sub4y_patches = im_crop(im_sub4y, box_w=256//4, box_h=256//4, stride=256//4)
+        im_lr_patches, _ = im_crop(im_lr, box_w=256//4, box_h=256//4, stride=256//4)
+        im_sr_patches, _ = im_crop(im_sr, box_w=256, box_h=256, stride=256)
+        im_sub4y_patches, _ = im_crop(im_sub4y, box_w=256//4, box_h=256//4, stride=256//4)
         for each in zip(im_lr_patches, im_sr_patches, im_sub4y_patches):
             # im_LRHR_show(each[0], each[1], each[2])
             train_x.append(np.array(each[0]))
