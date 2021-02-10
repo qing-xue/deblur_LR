@@ -4,4 +4,5 @@
 /Results/
 *.pkl
 *.cpython-37.pyc
+*.cpython-36.pyc
 *.m
