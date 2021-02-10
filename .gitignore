@@ -3,5 +3,5 @@
 /GFN/models/
 /Results/
 *.pkl
-*.pyc
+*.cpython-37.pyc
 *.m
