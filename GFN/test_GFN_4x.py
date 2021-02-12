@@ -30,6 +30,7 @@ parser.add_argument("--gated", type=bool, default=True, help="Activated gate mod
 parser.add_argument("--isTest", type=bool, default=True, help="Test or not")
 parser.add_argument('--dataset', required=True, help='Path of the validation dataset')
 parser.add_argument("--intermediate_process", default="", type=str, help="Test on intermediate pkl (default: none)")
+parser.add_argument('--test_dir', required=True, help='GFN/models/3, Path of the test model')
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -136,8 +137,8 @@ if opt.intermediate_process:
     else:
         print("It's not a pkl file. Please give a correct pkl folder on command line for example --opt.intermediate_process /models/1/GFN_epoch_25.pkl)")
 else:
-    # test_dir = 'models/'
-    test_dir = 'GFN/models/3'
+    # test_dir = 'GFN/models/3/'
+    test_dir = opt.test_dir
     test_list = [x for x in sorted(os.listdir(test_dir)) if is_pkl(x)]
     print("Testing on the given 3-step trained model which stores in /models, and ends with pkl.")
     for i in range(len(test_list)):
