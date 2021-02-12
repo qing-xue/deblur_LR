@@ -7,6 +7,7 @@ from PIL import Image, ImageDraw
 import os
 from matplotlib import pyplot as plt
 import random
+import argparse
 
 def im_crop(im, box_w=256, box_h=256, stride_w=256, stride_h=256, epsilon=10):
     """Crop image to get patches.
@@ -71,20 +72,19 @@ def im_LRHR_show(im_lr, im_hr, im_lr_GT):
     plt.close()
 
 
-# python im2hdf5.py F:/workplace/public_dataset/REDS /*/*.png 1000
-# REDS = 'F:/workplace/public_dataset/REDS'
-# files = '/*/*.png'
-# num_per_hf5 = 1000  
+# parser 命令行用法：= 号后面不加引号；空格后面加引号
+# python im2hdf5.py --REDS=F:/workplace/public_dataset/REDS --imgs=/*/*.png --batch=1000
 if __name__ == '__main__':
 
-    test_im_crop()
+    parser = argparse.ArgumentParser(description="Image to .hdf5 fills")
+    parser.add_argument("--REDS", required=True, help="REDS dataset dir, eg. 'dataset/REDS'")
+    parser.add_argument("--imgs", required=True, help="Image file to match, eg. '/*/*.png'")
+    parser.add_argument("--batch", default=1000, type=int, help="How many images per .hdf5")
 
-    # REDS = 'F:/workplace/public_dataset/REDS'
-    # files = '/*/*.png'
-    # num_per_hf5 = 100 
-    REDS = sys.argv[1]
-    files = sys.argv[2]
-    num_per_hf5 = int(sys.argv[3])    # notice that if it can divide exactly!!!
+    opt = parser.parse_args()
+    REDS = opt.REDS
+    files = opt.imgs
+    num_per_hf5 = opt.batch
 
     train_blur_bicubic = REDS + '/train/train_blur_bicubic/X4'
     train_sharp = REDS + '/train/train_sharp'
@@ -108,9 +108,9 @@ if __name__ == '__main__':
         im_sub4y = im_sr.resize((im_sr.size[0] // 4, im_sr.size[1] // 4), Image.BICUBIC)
   
         # get patches
-        im_lr_patches, _ = im_crop(im_lr, box_w=256//4, box_h=256//4, stride=256//4)
-        im_sr_patches, _ = im_crop(im_sr, box_w=256, box_h=256, stride=256)
-        im_sub4y_patches, _ = im_crop(im_sub4y, box_w=256//4, box_h=256//4, stride=256//4)
+        im_lr_patches, _ = im_crop(im_lr, box_w=256//4, box_h=256//4, stride_w=256//4, stride_h=256//4)
+        im_sr_patches, _ = im_crop(im_sr, box_w=256, box_h=256, stride_w=256//4, stride_h=256//4)
+        im_sub4y_patches, _ = im_crop(im_sub4y, box_w=256//4, box_h=256//4, stride_w=256//4, stride_h=256//4)
         for each in zip(im_lr_patches, im_sr_patches, im_sub4y_patches):
             # im_LRHR_show(each[0], each[1], each[2])
             train_x.append(np.array(each[0]))
