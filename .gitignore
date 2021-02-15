@@ -3,6 +3,7 @@
 /GFN/models/
 /Results/
 /GFN/datasets/__pycache__/
+/log/test.log
 *.pkl
 *.cpython-37.pyc
 *.cpython-36.pyc

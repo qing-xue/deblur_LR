@@ -6,6 +6,7 @@ from PIL import Image
 from torch.utils.data import Dataset
 import random
 
+# 作为验证集需改为顺序读取
 def find_lr_hr_file(base):
     for root, ds, fs in os.walk(base):
         for f in fs:

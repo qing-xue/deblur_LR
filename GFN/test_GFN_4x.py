@@ -23,6 +23,10 @@ from datasets.my_dataset import DealDataset
 import statistics
 import matplotlib.pyplot as plot
 import re
+from my_utils import Logger
+import sys
+
+sys.stdout = Logger('log/test.log', sys.stdout)
 
 parser = argparse.ArgumentParser(description="PyTorch GFN Test")
 parser.add_argument("--scale", default=4, type=int, help="scale factor, Default: 4")
@@ -85,20 +89,14 @@ def test(test_gen, model, criterion, SR_dir):
 
             resultSRDeblur = transforms.ToPILImage()(sr.cpu()[0])
             resultSRDeblur.save(join(SR_dir, '{0:04d}_GFN_4x.png'.format(iteration)))
-            print("Processing {}".format(iteration))
+            if iteration % 100 == 0: 
+                print("Processing {}".format(iteration))
             mse = criterion(sr, HR)
             psnr = 10 * log10(1 / mse)
             avg_psnr += psnr
 
-        str_psnr = "Avg. SR PSNR:{:4f} dB".format(avg_psnr / iteration)
-        str_mt   = "Mean time: " + str(statistics.median(med_time))
-        print(str_psnr)
-        print(str_mt)
-        # save
-        f = open('log/test.txt', 'w')
-        f.write(str_psnr)
-        f.write(str_mt)
-        f.close()
+        print("Avg. SR PSNR:{:4f} dB".format(avg_psnr / iteration))
+        print("Mean time: {}".format(str(statistics.median(med_time))))
 
 def model_test(model):
     model = model.to(device)
