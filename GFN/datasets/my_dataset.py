@@ -23,7 +23,7 @@ def find_lr_hr_file(root):
         if is_image_file(child):
             fullname = child
             ref_full = fullname.replace("val_blur_bicubic/X4", "val_sharp")
-            print(fullname)
+            # print(fullname)
             yield fullname, ref_full
         else:
             for x in sorted(os.listdir(child)):
@@ -31,7 +31,7 @@ def find_lr_hr_file(root):
                 if is_image_file(_file):
                     fullname = _file
                     ref_full = fullname.replace("val_blur_bicubic/X4", "val_sharp")
-                    print(fullname)
+                    # print(fullname)
                     yield fullname, ref_full
 
 class DealDataset(Dataset):
