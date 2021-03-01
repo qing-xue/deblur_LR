@@ -10,13 +10,12 @@ import sys
 import os
 from os.path import join
 
-#=================== Utils ===================#
+
 def is_image_file(filename):
     if filename.startswith('._'):
         return
     return any(filename.endswith(extension) for extension in [".png", ".jpg", ".jpeg"])
 
-#=================== Testing ===================#
 
 class DataValSet(data.Dataset):
     def __init__(self, root_dir):

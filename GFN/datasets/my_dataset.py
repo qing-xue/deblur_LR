@@ -7,6 +7,7 @@ from torch.utils.data import Dataset
 import random
 from datasets.dataset_hf5 import is_image_file
 
+
 # 作为验证集需改为顺序读取
 def find_lr_hr_file2(base):
     for root, ds, fs in os.walk(base):
@@ -16,13 +17,14 @@ def find_lr_hr_file2(base):
                 ref_full = fullname.replace("val_blur_bicubic/X4", "val_sharp")
                 yield fullname, ref_full
 
+
 # ugly...
-def find_lr_hr_file(root):
+def find_lr_hr_file(root, subs_path="test/test_blur_bicubic/X4"):
     for _dir in sorted(os.listdir(root)):
         child = os.path.join(root, _dir)
         if is_image_file(child):
             fullname = child
-            ref_full = fullname.replace("val_blur_bicubic/X4", "val_sharp")
+            ref_full = fullname.replace(subs_path, "val/val_sharp")
             # print(fullname)
             yield fullname, ref_full
         else:
@@ -30,9 +32,10 @@ def find_lr_hr_file(root):
                 _file = os.path.join(child, x)
                 if is_image_file(_file):
                     fullname = _file
-                    ref_full = fullname.replace("val_blur_bicubic/X4", "val_sharp")
+                    ref_full = fullname.replace(subs_path, "val/val_sharp")
                     # print(fullname)
                     yield fullname, ref_full
+
 
 class DealDataset(Dataset):
     """
@@ -69,6 +72,7 @@ class DealDataset(Dataset):
 
     def __len__(self):
         return self.len
+
 
 class TripleDataSet(Dataset):
     def __init__(self, h5py_file_path):

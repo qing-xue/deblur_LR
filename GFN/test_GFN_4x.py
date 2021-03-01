@@ -44,13 +44,16 @@ test_set=[
     {'gated':True}
 ]
 
+
 def is_pkl(filename):
     return any(filename.endswith(extension) for extension in [".pkl"])
+
 
 def which_trainingstep_epoch(resume):
     trainingstep = "".join(re.findall(r"\d", resume)[0])
     start_epoch = "".join(re.findall(r"\d", resume)[1:])
     return int(trainingstep), int(start_epoch)
+
 
 def displayFeature(feature):
     feat_permute = feature.permute(1, 0, 2, 3)
@@ -58,6 +61,7 @@ def displayFeature(feature):
     grid = grid.numpy().transpose((1, 2, 0))
     display_grid = grid[:, :, 0]
     plot.imshow(display_grid)
+
 
 def test(test_gen, model, criterion, SR_dir):
     avg_psnr = 0
@@ -79,24 +83,27 @@ def test(test_gen, model, criterion, SR_dir):
             else:
                 gated_Tensor = torch.cuda.FloatTensor().resize_(1).zero_()
 
-            start_time = time.perf_counter()#-------------------------begin to deal with an image's time
+            start_time = time.perf_counter()  # begin to deal with an image's time
             [lr_deblur, sr] = model(LR_Blur, gated_Tensor, test_Tensor)
-            #modify
+            # modify
             sr = torch.clamp(sr, min=0, max=1)
-            torch.cuda.synchronize()#wait for CPU & GPU time syn
-            evalation_time = time.perf_counter() - start_time#---------finish an image
+            torch.cuda.synchronize()  # wait for CPU & GPU time syn
+            evalation_time = time.perf_counter() - start_time  # finish an image
             med_time.append(evalation_time)
 
             resultSRDeblur = transforms.ToPILImage()(sr.cpu()[0])
             resultSRDeblur.save(join(SR_dir, '{0:04d}_GFN_4x.png'.format(iteration)))
             if iteration % 100 == 0: 
                 print("Processing {}".format(iteration))
-            mse = criterion(sr, HR)
-            psnr = 10 * log10(1 / mse)
-            avg_psnr += psnr
+            # 计算损失，与 test_gen 耦合
+            if HR.nelement() != 0:
+                mse = criterion(sr, HR)
+                psnr = 10 * log10(1 / mse)
+                avg_psnr += psnr
 
         print("Avg. SR PSNR:{:4f} dB".format(avg_psnr / iteration))
         print("Mean time: {}".format(str(statistics.median(med_time))))
+
 
 def model_test(model):
     model = model.to(device)
@@ -110,6 +117,7 @@ def model_test(model):
             setattr(m, 'padding_mode', 'zeros')    # xueqing 2021-02-21
 
     test(testloader, model, criterion, SR_dir)
+
 
 opt = parser.parse_args()
 root_val_dir = opt.dataset                         #----------Validation path
