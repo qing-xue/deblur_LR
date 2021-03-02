@@ -9,6 +9,12 @@ from matplotlib import pyplot as plt
 import random
 import argparse
 
+parser = argparse.ArgumentParser(description="Image to .hdf5 fills")
+parser.add_argument("--REDS", required=True, help="REDS dataset dir, eg. 'dataset/REDS'")
+parser.add_argument("--imgs", required=True, help="Image file to match, eg. '/*/*.png'")
+parser.add_argument("--batch", default=1000, type=int, help="How many images per .hdf5")
+
+
 def im_crop(im, box_w=256, box_h=256, stride_w=256, stride_h=256, epsilon=10):
     """Crop image to get patches.
 
@@ -48,6 +54,7 @@ def im_crop(im, box_w=256, box_h=256, stride_w=256, stride_h=256, epsilon=10):
 
     return patches, patches_idx
 
+
 def test_im_crop():
     im = Image.open('F:/workplace/public_dataset/REDS/val/val_sharp/000/00000000.png')
     patches, boxes = im_crop(im, box_w=256, box_h=256, stride_w=256, stride_h=256)
@@ -57,6 +64,7 @@ def test_im_crop():
         draw.rectangle(box, outline=color, width=3)
         im.show()
     im.show()
+
 
 def im_LRHR_show(im_lr, im_hr, im_lr_GT):
     plt.subplot(2,2,1)
@@ -75,12 +83,6 @@ def im_LRHR_show(im_lr, im_hr, im_lr_GT):
 # parser 命令行用法：= 号后面不加引号；空格后面加引号
 # python im2hdf5.py --REDS=F:/workplace/public_dataset/REDS --imgs=/*/*.png --batch=1000
 if __name__ == '__main__':
-
-    parser = argparse.ArgumentParser(description="Image to .hdf5 fills")
-    parser.add_argument("--REDS", required=True, help="REDS dataset dir, eg. 'dataset/REDS'")
-    parser.add_argument("--imgs", required=True, help="Image file to match, eg. '/*/*.png'")
-    parser.add_argument("--batch", default=1000, type=int, help="How many images per .hdf5")
-
     opt = parser.parse_args()
     REDS = opt.REDS
     files = opt.imgs

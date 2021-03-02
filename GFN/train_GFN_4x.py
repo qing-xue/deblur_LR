@@ -15,8 +15,7 @@ import os
 from os.path import join
 import torch
 from torch.utils.data import DataLoader
-# from datasets.dataset_hf5 import DataSet
-from datasets.my_dataset import TripleDataSet
+from datasets.dataset_hf5 import DataTrainSet
 from networks.GFN_4x import Net
 import random
 import re
@@ -164,9 +163,7 @@ for i in range(opt.start_training_step, 4):
         random.shuffle(train_sets)
         for j in range(len(train_sets)):
             print("Step {}:Training folder is {}-------------------------------".format(i, train_sets[j]))
-            # train_set = DataSet(join(train_dir, train_sets[j]))
-            train_set = TripleDataSet(join(train_dir, train_sets[j]))
-            # train_set = DealDataset(join(train_dir, train_sets[j]))
+            train_set = DataTrainSet(join(train_dir, train_sets[j]))
             # num_workers改为0，单进程加载
             trainloader = DataLoader(dataset=train_set, batch_size=opt.batchSize, shuffle=True, num_workers=0)
             train(trainloader, model, criterion, optimizer, epoch)

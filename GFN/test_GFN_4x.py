@@ -19,7 +19,6 @@ from torchvision import utils as utils
 import torch
 from torch.utils.data import DataLoader
 from datasets.dataset_hf5 import DataValSet
-from datasets.my_dataset import DealDataset
 import statistics
 import matplotlib.pyplot as plot
 import re
@@ -51,7 +50,7 @@ def is_pkl(filename):
 
 def which_trainingstep_epoch(resume):
     trainingstep = "".join(re.findall(r"\d", resume)[0])
-    start_epoch = "".join(re.findall(r"\d", resume)[1:])
+    start_epoch  = "".join(re.findall(r"\d", resume)[1:])
     return int(trainingstep), int(start_epoch)
 
 
@@ -120,7 +119,7 @@ def model_test(model):
 
 
 opt = parser.parse_args()
-root_val_dir = opt.dataset                         #----------Validation path
+root_val_dir = opt.dataset                         # Validation path
 # SR_dir = join(root_val_dir, 'Results') 
 SR_dir = join('.', 'Results')
 isexists = os.path.exists(SR_dir)
@@ -128,8 +127,7 @@ if not isexists:
     os.makedirs(SR_dir)
 print("The results of testing images sotre in {}.".format(SR_dir))
 
-# testloader = DataLoader(DataValSet(root_val_dir), batch_size=1, shuffle=False, pin_memory=False)
-testloader = DataLoader(DealDataset(root_val_dir), batch_size=1, shuffle=False, pin_memory=False)
+testloader = DataLoader(DataValSet(root_val_dir), batch_size=1, shuffle=False, pin_memory=False)
 print("===> Loading model and criterion")
 
 if opt.intermediate_process:
