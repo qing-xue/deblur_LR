@@ -18,8 +18,8 @@ def find_lr_hr_file2(base):
                 yield fullname, ref_full
 
 
-# ugly...
-def find_lr_hr_file(root, subs_path="test/test_blur_bicubic/X4"):
+# ugly... 作为验证集需改为顺序读取
+def find_lr_hr_file(root, subs_path="val/val_blur_bicubic/X4"):
     for _dir in sorted(os.listdir(root)):
         child = os.path.join(root, _dir)
         if is_image_file(child):
