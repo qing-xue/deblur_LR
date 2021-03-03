@@ -4,6 +4,9 @@ import imageio
 from PIL import Image
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 
+datadir = 'F:/workplace/public_dataset/REDS/val/val_blur_bicubic/'
+
+
 def findAllFile(base):
     for root, ds, fs in os.walk(base):
         for f in fs:
@@ -12,7 +15,6 @@ def findAllFile(base):
                 ref_full = fullname.replace("val_blur_bicubic/X4", "val_sharp")
                 yield fullname, ref_full
 
-datadir = 'F:/workplace/public_dataset/REDS/val/val_blur_bicubic/'
 
 def main():
     count = 0
@@ -36,6 +38,7 @@ def main():
         if count % 100 == 0:
             print("%d Images, mean PSNR = %f" % (count, all_psnr / count) )    # 25.82, 25.83, 25.84
             print("%d Images, mean SSIM = %f" % (count, all_ssim / count) )    # 0.687, 0.689, 0.687
+
 
 if __name__ == '__main__':
     main()

@@ -121,7 +121,7 @@ def model_test(model):
 opt = parser.parse_args()
 root_val_dir = opt.dataset                         # Validation path
 # SR_dir = join(root_val_dir, 'Results') 
-SR_dir = join('.', 'Results')
+SR_dir = join('.', 'Results/all')
 isexists = os.path.exists(SR_dir)
 if not isexists:
     os.makedirs(SR_dir)
