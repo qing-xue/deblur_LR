@@ -17,6 +17,7 @@ import torch
 from torch.utils.data import DataLoader
 from datasets.dataset_hf5 import DataTrainSet
 from networks.GFN_4x import Net
+from networks.vgg_perceptual_loss import VGGPerceptualLoss
 import random
 import re
 
@@ -50,12 +51,12 @@ training_settings = [
     {'nEpochs': 20, 'lr': 5e-5, 'step': 10, 'lr_decay': 0.1, 'lambda_db':   0, 'gated': True}
 ]
 
+
 def mkdir_steptraing():
     """Make dirs.
 
     Step training models store in models/1 & /2 & /3.
     """
-
     root_folder = os.path.abspath('./GFN')
     models_folder = join(root_folder, 'models')
     step1_folder, step2_folder, step3_folder = join(models_folder,'1'), join(models_folder,'2'), join(models_folder, '3')
@@ -66,13 +67,17 @@ def mkdir_steptraing():
         os.makedirs(step3_folder)
         print("===> Step training models store in models/1 & /2 & /3.")
 
+
 def is_hdf5_file(filename):
     return any(filename.endswith(extension) for extension in [".h5", "hdf5"])
 
+
 def which_trainingstep_epoch(resume):
+    """与目录结构耦合，如 models/3/_55.pkl """
     trainingstep = "".join(re.findall(r"\d", resume)[0])
     start_epoch = "".join(re.findall(r"\d", resume)[1:])
     return int(trainingstep), int(start_epoch) + 1
+
 
 def adjust_learning_rate(epoch):
         lr = opt.lr * (opt.lr_decay ** (epoch // opt.step))
@@ -80,16 +85,15 @@ def adjust_learning_rate(epoch):
         for param_group in optimizer.param_groups:
             param_group['lr'] = lr
 
+
 def checkpoint(step, epoch):
     model_out_path = "GFN/models/{}/GFN_epoch_{}.pkl".format(step, epoch)
     torch.save(model, model_out_path)
     print("===>Checkpoint saved to {}".format(model_out_path))
 
-def train(train_gen, model, criterion, optimizer, epoch):
-    """Train an epoch from different dirs.
 
-    """
-
+def train(train_gen, model, criterion, p_loss, optimizer, epoch):
+    """Train an epoch from different dirs. """
     epoch_loss = 0
     for iteration, batch in enumerate(train_gen, 1):
         # input, targetdeblur, targetsr
@@ -113,6 +117,7 @@ def train(train_gen, model, criterion, optimizer, epoch):
 
         loss1 = criterion(lr_deblur, LR_Deblur)
         loss2 = criterion(sr, HR)
+        lossp = p_loss(sr, HR)  # 仅在高分辨率图像处加感知损失
         mse = loss2 + opt.lambda_db * loss1
         epoch_loss += mse
         optimizer.zero_grad()
@@ -121,6 +126,7 @@ def train(train_gen, model, criterion, optimizer, epoch):
         # if iteration % 100 == 0:
         #     print("===> Epoch[{}]({}/{}): Loss{:.4f};".format(epoch, iteration, len(trainloader), mse.cpu()))
     print("===>Epoch{} Complete: Avg loss is :{:4f}".format(epoch, epoch_loss / len(trainloader)))
+
 
 opt = parser.parse_args()
 opt.seed = random.randint(1, 10000)
@@ -145,8 +151,10 @@ else:
     mkdir_steptraing()
 
 model = model.to(device)
-criterion = torch.nn.MSELoss(size_average=True)
+criterion = torch.nn.MSELoss(size_average=True) 
 criterion = criterion.to(device)
+vgg_loss = VGGPerceptualLoss()
+vgg_loss = vgg_loss.to(device)
 optimizer = optim.Adam(model.parameters(), lr=opt.lr)
 print()
 
@@ -166,7 +174,7 @@ for i in range(opt.start_training_step, 4):
             train_set = DataTrainSet(join(train_dir, train_sets[j]))
             # num_workers改为0，单进程加载
             trainloader = DataLoader(dataset=train_set, batch_size=opt.batchSize, shuffle=True, num_workers=0)
-            train(trainloader, model, criterion, optimizer, epoch)
+            train(trainloader, model, criterion, vgg_loss, optimizer, epoch)
         checkpoint(i, epoch)
     # Finish an epoch and reset start_epoch
     opt.start_epoch = 1
