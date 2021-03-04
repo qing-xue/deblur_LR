@@ -142,4 +142,5 @@ if __name__ == '__main__':
         dset1 = hdf5_file.create_dataset("data",  data = np.array(train_x).transpose((0, 3, 1, 2)))
         dset3 = hdf5_file.create_dataset("label", data = np.array(train_y).transpose((0, 3, 1, 2)))
         dset2 = hdf5_file.create_dataset("label_db", data = np.array(train_sub4y).transpose((0, 3, 1, 2)))
+        print("Done! The length of res: ", len(dset2))
 

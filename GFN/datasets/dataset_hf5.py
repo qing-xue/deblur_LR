@@ -50,7 +50,7 @@ class DataTrainSet(data.Dataset):
     """ 获取训练集 .hdf5 数据 """
 
     def __init__(self, h5py_file_path):
-        super(DataSet, self).__init__()  
+        super(DataTrainSet, self).__init__()  
         self.hdf5_file  = h5py_file_path
         self.file    = h5py.File(self.hdf5_file, 'r')
         self.inputs  = self.file['data']

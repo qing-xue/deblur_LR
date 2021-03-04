@@ -45,10 +45,17 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 #     {'nEpochs': 60, 'lr': 1e-4, 'step': 30, 'lr_decay': 0.1, 'lambda_db': 0.5, 'gated': False},
 #     {'nEpochs': 55, 'lr': 5e-5, 'step': 25, 'lr_decay': 0.1, 'lambda_db':   0, 'gated': True}
 # ]
+# My training
+# training_settings = [
+#     {'nEpochs': 10, 'lr': 1e-4, 'step':  2, 'lr_decay': 0.5, 'lambda_db': 0.5, 'gated': False},
+#     {'nEpochs': 20, 'lr': 1e-4, 'step': 10, 'lr_decay': 0.1, 'lambda_db': 0.5, 'gated': False},
+#     {'nEpochs': 20, 'lr': 5e-5, 'step': 10, 'lr_decay': 0.1, 'lambda_db':   0, 'gated': True}
+# ]
+# Re-training, with no lr_decay; only use 3rd row
 training_settings = [
     {'nEpochs': 10, 'lr': 1e-4, 'step':  2, 'lr_decay': 0.5, 'lambda_db': 0.5, 'gated': False},
     {'nEpochs': 20, 'lr': 1e-4, 'step': 10, 'lr_decay': 0.1, 'lambda_db': 0.5, 'gated': False},
-    {'nEpochs': 20, 'lr': 5e-5, 'step': 10, 'lr_decay': 0.1, 'lambda_db':   0, 'gated': True}
+    {'nEpochs': 10 + 20, 'lr': 5e-5, 'step': 10, 'lr_decay': 0.1, 'lambda_db':   0, 'gated': True}
 ]
 
 
@@ -119,7 +126,7 @@ def train(train_gen, model, criterion, p_loss, optimizer, epoch):
         loss2 = criterion(sr, HR)
         lossp = p_loss(sr, HR)  # 仅在高分辨率图像处加感知损失
         mse = loss2 + opt.lambda_db * loss1
-        epoch_loss += mse
+        epoch_loss += (mse + 0.1 * lossp)  # 0.1 ref UID-GAN
         optimizer.zero_grad()
         mse.backward()
         optimizer.step()
@@ -146,6 +153,11 @@ if opt.resume:
         model = torch.load(opt.resume)
         model.load_state_dict(model.state_dict())
         opt.start_training_step, opt.start_epoch = which_trainingstep_epoch(opt.resume)
+        # some version pytorch adds 'padding_mode' to the attributes of Conv2d
+        for m in model.modules():
+            if 'Conv' in str(type(m)):
+                setattr(m, 'padding_mode', 'zeros')    # xueqing 2021-02-21
+
 else:
     model = Net()
     mkdir_steptraing()
@@ -158,6 +170,7 @@ vgg_loss = vgg_loss.to(device)
 optimizer = optim.Adam(model.parameters(), lr=opt.lr)
 print()
 
+# start_training_step may be 1,2,3
 for i in range(opt.start_training_step, 4):
     opt.nEpochs   = training_settings[i-1]['nEpochs']
     opt.lr        = training_settings[i-1]['lr']
