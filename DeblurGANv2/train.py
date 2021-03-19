@@ -168,13 +168,15 @@ class Trainer:
 
 
 if __name__ == '__main__':
+    # Python引入了with语句来自动帮我们调用close()方法
     with open('config/config.yaml', 'r') as f:
         config = yaml.load(f)
 
     batch_size = config.pop('batch_size')
+    # partial 的功能：固定函数参数，返回一个新的函数
     get_dataloader = partial(DataLoader, batch_size=batch_size, num_workers=cpu_count(), shuffle=True, drop_last=True)
 
-    datasets = map(config.pop, ('train', 'val'))
+    datasets = map(config.pop, ('train', 'val'))  # print(list(datasets))
     datasets = map(PairedDataset.from_config, datasets)
     train, val = map(get_dataloader, datasets)
     trainer = Trainer(config, train=train, val=val)

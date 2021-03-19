@@ -2,7 +2,9 @@ import torch
 import torch.nn as nn
 from models.mobilenet_v2 import MobileNetV2
 
+
 class FPNHead(nn.Module):
+
     def __init__(self, num_in, num_mid, num_out):
         super().__init__()
 
@@ -16,17 +18,16 @@ class FPNHead(nn.Module):
 
 
 class FPNMobileNet(nn.Module):
+    """ 构建图2中最右边的金字塔结构 """
 
     def __init__(self, norm_layer, output_ch=3, num_filters=64, num_filters_fpn=128, pretrained=True):
         super().__init__()
 
         # Feature Pyramid Network (FPN) with four feature maps of resolutions
         # 1/4, 1/8, 1/16, 1/32 and `num_filters` filters for all feature maps.
-
-        self.fpn = FPN(num_filters=num_filters_fpn, norm_layer = norm_layer, pretrained=pretrained)
+        self.fpn = FPN(num_filters=num_filters_fpn, norm_layer=norm_layer, pretrained=pretrained)
 
         # The segmentation heads on top of the FPN
-
         self.head1 = FPNHead(num_filters_fpn, num_filters, num_filters)
         self.head2 = FPNHead(num_filters_fpn, num_filters, num_filters)
         self.head3 = FPNHead(num_filters_fpn, num_filters, num_filters)
@@ -50,9 +51,9 @@ class FPNMobileNet(nn.Module):
         self.fpn.unfreeze()
 
     def forward(self, x):
-
         map0, map1, map2, map3, map4 = self.fpn(x)
 
+        # 图2最右侧部分，Upscale 8x, 4x, 2x
         map4 = nn.functional.upsample(self.head4(map4), scale_factor=8, mode="nearest")
         map3 = nn.functional.upsample(self.head3(map3), scale_factor=4, mode="nearest")
         map2 = nn.functional.upsample(self.head2(map2), scale_factor=2, mode="nearest")
@@ -70,6 +71,7 @@ class FPNMobileNet(nn.Module):
 
 
 class FPN(nn.Module):
+    """ 构建图2中左边两个金字塔结构，下采样和上采样对应 """
 
     def __init__(self, norm_layer, num_filters=128, pretrained=True):
         """Creates an `FPN` instance for feature extraction.
@@ -78,16 +80,16 @@ class FPN(nn.Module):
           pretrained: use ImageNet pre-trained backbone feature extractor
         """
 
-        super().__init__()
+        super().__init__()  # super和父类没有实质性的关联、MRO列表
         net = MobileNetV2(n_class=1000)
 
         if pretrained:
-            #Load weights into the project directory
-            state_dict = torch.load('mobilenetv2.pth.tar') # add map_location='cpu' if no gpu
+            # Load weights into the project directory
+            state_dict = torch.load('mobilenetv2.pth.tar')  # add map_location='cpu' if no gpu
             net.load_state_dict(state_dict)
         self.features = net.features
 
-        self.enc0 = nn.Sequential(*self.features[0:2])
+        self.enc0 = nn.Sequential(*self.features[0:2])  # *args -> tuple
         self.enc1 = nn.Sequential(*self.features[2:4])
         self.enc2 = nn.Sequential(*self.features[4:7])
         self.enc3 = nn.Sequential(*self.features[7:11])
@@ -103,6 +105,7 @@ class FPN(nn.Module):
                                  norm_layer(num_filters),
                                  nn.ReLU(inplace=True))
 
+        # 图2中5组1x1的黄色卷积核
         self.lateral4 = nn.Conv2d(160, num_filters, kernel_size=1, bias=False)
         self.lateral3 = nn.Conv2d(64, num_filters, kernel_size=1, bias=False)
         self.lateral2 = nn.Conv2d(32, num_filters, kernel_size=1, bias=False)
@@ -116,32 +119,24 @@ class FPN(nn.Module):
         for param in self.features.parameters():
             param.requires_grad = True
 
-
     def forward(self, x):
-
         # Bottom-up pathway, from ResNet
         enc0 = self.enc0(x)
-
-        enc1 = self.enc1(enc0) # 256
-
-        enc2 = self.enc2(enc1) # 512
-
-        enc3 = self.enc3(enc2) # 1024
-
-        enc4 = self.enc4(enc3) # 2048
+        enc1 = self.enc1(enc0)  # 256
+        enc2 = self.enc2(enc1)  # 512
+        enc3 = self.enc3(enc2)  # 1024
+        enc4 = self.enc4(enc3)  # 2048
 
         # Lateral connections
-
         lateral4 = self.lateral4(enc4)
         lateral3 = self.lateral3(enc3)
         lateral2 = self.lateral2(enc2)
         lateral1 = self.lateral1(enc1)
         lateral0 = self.lateral0(enc0)
 
-        # Top-down pathway
+        # Top-down pathway. 侧边与上层上采样相加后都要经过卷积层
         map4 = lateral4
         map3 = self.td1(lateral3 + nn.functional.upsample(map4, scale_factor=2, mode="nearest"))
         map2 = self.td2(lateral2 + nn.functional.upsample(map3, scale_factor=2, mode="nearest"))
         map1 = self.td3(lateral1 + nn.functional.upsample(map2, scale_factor=2, mode="nearest"))
         return lateral0, map1, map2, map3, map4
-

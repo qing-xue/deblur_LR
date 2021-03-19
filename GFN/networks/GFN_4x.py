@@ -53,6 +53,7 @@ class _ResBlockSR(nn.Module):
         out = torch.add(residual, out)
         return out
 
+
 class _DeblurringMoudle(nn.Module):
     def __init__(self):
         super(_DeblurringMoudle, self).__init__()
@@ -111,6 +112,7 @@ class _DeblurringMoudle(nn.Module):
         deblur_out = self.convout(torch.add(deblur_feature, con1))  # 全局跳跃连接，再接convout
         return deblur_feature, deblur_out      # 返回deblur特征图和低分辨率的deblur输出
 
+
 class _SRMoudle(nn.Module):
     """Super-resolution feature extraction module.
 
@@ -143,6 +145,7 @@ class _SRMoudle(nn.Module):
         sr_feature = torch.add(con2, con1)
         return sr_feature
 
+
 class _GateMoudle(nn.Module):
     def __init__(self):
         super(_GateMoudle, self).__init__()
@@ -163,6 +166,7 @@ class _GateMoudle(nn.Module):
         con1 = self.relu(self.conv1(x))
         scoremap = self.conv2(con1)
         return scoremap
+
 
 class _ReconstructMoudle(nn.Module):
     """Reconstruction module.
@@ -207,6 +211,7 @@ class _ReconstructMoudle(nn.Module):
         con3 = self.relu3(self.conv3(pixelshuffle2))
         sr_deblur = self.conv4(con3)
         return sr_deblur
+
 
 class Net(nn.Module):
     def __init__(self):

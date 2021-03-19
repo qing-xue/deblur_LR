@@ -8,6 +8,8 @@
 *.cpython-37.pyc
 *.cpython-36.pyc
 *.m
+/.idea/
+/DeblurGANv2/fpn/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

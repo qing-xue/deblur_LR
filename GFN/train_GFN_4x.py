@@ -112,13 +112,13 @@ def train(train_gen, model, criterion, p_loss, optimizer, epoch):
         HR = HR.to(device)
 
         if opt.isTest == True:
-            test_Tensor = torch.cuda.FloatTensor().resize_(1).zero_()+1
+            test_Tensor = (torch.FloatTensor().resize_(1).zero_()+1).to(device)
         else:
-            test_Tensor = torch.cuda.FloatTensor().resize_(1).zero_()
+            test_Tensor = (torch.FloatTensor().resize_(1).zero_()).to(device)
         if opt.gated == True:
-            gated_Tensor = torch.cuda.FloatTensor().resize_(1).zero_()+1
+            gated_Tensor = (torch.FloatTensor().resize_(1).zero_()+1).to(device)
         else:
-            gated_Tensor = torch.cuda.FloatTensor().resize_(1).zero_()
+            gated_Tensor = (torch.FloatTensor().resize_(1).zero_()).to(device)
 
         [lr_deblur, sr] = model(LR_Blur, gated_Tensor, test_Tensor)
 
@@ -150,13 +150,13 @@ print("===> Loading model and criterion")
 if opt.resume:
     if os.path.isfile(opt.resume):
         print("Loading from checkpoint {}".format(opt.resume))
-        model = torch.load(opt.resume)
+        model = torch.load(opt.resume, map_location=torch.device('cpu'))
         model.load_state_dict(model.state_dict())
         opt.start_training_step, opt.start_epoch = which_trainingstep_epoch(opt.resume)
         # some version pytorch adds 'padding_mode' to the attributes of Conv2d
         for m in model.modules():
             if 'Conv' in str(type(m)):
-                setattr(m, 'padding_mode', 'zeros')    # xueqing 2021-02-21
+                setattr(m, 'padding_mode', 'zeros')
 
 else:
     model = Net()

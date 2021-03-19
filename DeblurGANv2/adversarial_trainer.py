@@ -1,6 +1,8 @@
 import torch
 import copy
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 
 class GANFactory:
     factories = {}
@@ -60,7 +62,7 @@ class NoGAN(GANTrainer):
 class SingleGAN(GANTrainer):
     def __init__(self, net_d, criterion):
         GANTrainer.__init__(self, net_d, criterion)
-        self.net_d = self.net_d.cuda()
+        self.net_d = self.net_d.to(device)
 
     def loss_d(self, pred, gt):
         return self.criterion(self.net_d, pred, gt)
@@ -79,8 +81,8 @@ class SingleGAN(GANTrainer):
 class DoubleGAN(GANTrainer):
     def __init__(self, net_d, criterion):
         GANTrainer.__init__(self, net_d, criterion)
-        self.patch_d = net_d['patch'].cuda()
-        self.full_d = net_d['full'].cuda()
+        self.patch_d = net_d['patch'].to(device)
+        self.full_d = net_d['full'].to(device)
         self.full_criterion = copy.deepcopy(criterion)
 
     def loss_d(self, pred, gt):

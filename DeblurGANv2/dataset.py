@@ -125,6 +125,7 @@ class PairedDataset(Dataset):
         hash_fn = hash_from_paths
         # ToDo: add more hash functions
         verbose = config.get('verbose', True)
+        # 随机方式裁剪，如何能覆盖到整张图片??
         data = subsample(data=zip(files_a, files_b),
                          bounds=config.get('bounds', (0, 1)),
                          hash_fn=hash_fn,
